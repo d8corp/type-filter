@@ -1,0 +1,11 @@
+var typeFilter = require('./typeFilter');
+typeFilter.typeFilter = typeFilter;
+typeFilter.getType = require('./getType');
+typeFilter.yes = require('./yes');
+typeFilter.no = require('./no');
+typeFilter.on = require('./on');
+typeFilter.off = require('./off');
+typeFilter.type = require('./type');
+typeFilter.typeClass = require('./typeClass');
+typeFilter.call = require('./call');
+module.exports = typeFilter;

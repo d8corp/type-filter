@@ -1,0 +1,28 @@
+{
+  "name": "type-filter",
+  "author": "Deight",
+  "version": "1.0.0",
+  "description": "filtering values by type",
+  "keywords": [
+    "types",
+    "typification",
+    "filtering",
+    "type filtering"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d8corp/type-filter.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/d8corp/type-filter/issues"
+  },
+  "homepage": "https://github.com/d8corp/type-filter#readme",
+  "devDependencies": {
+    "jest": "^22.1.4"
+  },
+  "scripts": {
+    "start": "jest --colors --watch --testPathPattern index.spec.js --testNamePattern typeFilter",
+    "test": "jest --colors --testPathPattern index.spec.js --testNamePattern typeFilter"
+  }
+}
