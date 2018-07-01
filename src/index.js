@@ -46,14 +46,14 @@ function getType (value) {
  * @param {typeFilterOptionsAsObject|typeFilterOptionsAsFunction|Array} [options]
  * @param {String} [type]
  * @param {String} [className]
- * @property {Function} yes
- * @property {Function} no
- * @property {Function} on
- * @property {Function} off
- * @property {Function} call
- * @property {Function} type
- * @property {Function} typeClass
- * @property {Function} error
+ * @property {typeFilterOptionsAsFunction} yes
+ * @property {typeFilterOptionsAsFunction} no
+ * @property {typeFilterOptionsAsFunction} on
+ * @property {typeFilterOptionsAsFunction} off
+ * @property {typeFilterOptionsAsFunction} call
+ * @property {typeFilterOptionsAsFunction} type
+ * @property {typeFilterOptionsAsFunction} typeClass
+ * @property {typeFilterOptionsAsFunction} error
  * */
 function typeFilter (value, options, type, className) {
   if (!options) return getType(value);
