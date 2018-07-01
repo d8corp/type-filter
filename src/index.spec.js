@@ -6,7 +6,8 @@ var yes = typeFilter.yes,
     off = typeFilter.off,
     call = typeFilter.call,
     type = typeFilter.type,
-    typeClass = typeFilter.typeClass;
+    typeClass = typeFilter.typeClass,
+    error = typeFilter.error;
 
 function MyClass () {}
 
@@ -124,5 +125,21 @@ describe('typeFilter', function () {
     typeFilter('1', options);
     expect(call.mock.calls.length).toBe(1);
     expect(call.mock.calls[0][0]).toBe('1');
+  });
+  it('error', () => {
+    expect(function () {
+      typeFilter(1, error('Error text'))
+    }).toThrow('Error text');
+    expect(function () {
+      typeFilter(1, error('value: {value}, type: {type}, className: {className}'))
+    }).toThrow('value: 1, type: number, className: ');
+    expect(function () {
+      typeFilter(1, error('field: {field}, fieldAsFunction: {fieldAsFunction}', {
+        field: 'field value',
+        fieldAsFunction: function () {
+          return 'value of field'
+        }
+      }))
+    }).toThrow('field: field value, fieldAsFunction: value of field');
   });
 });

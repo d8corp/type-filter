@@ -1,4 +1,26 @@
-var getType = require('./getType');
+/**
+ * @typedef {'null'|'undefined'|'string'|'number'|'boolean'|'function'|'object'|'array'|'class'|'nan'} getTypeResult
+ * */
+/** @return {getTypeResult} */
+function getType (value) {
+  if (value === null) {
+    return 'null'
+  }
+  var valueType = typeof value;
+  if (valueType === 'number' && isNaN(value)) {
+    return 'nan'
+  }
+  if (valueType !== 'object') {
+    return valueType
+  }
+  if (!value.__proto__ || !value.__proto__.__proto__) {
+    return 'object'
+  }
+  if (value instanceof Array) {
+    return 'array'
+  }
+  return 'class'
+}
 /**
  * @callback typeFilterOptionsAsFunction
  * @param {*} value
@@ -24,6 +46,14 @@ var getType = require('./getType');
  * @param {typeFilterOptionsAsObject|typeFilterOptionsAsFunction|Array} [options]
  * @param {String} [type]
  * @param {String} [className]
+ * @property {Function} yes
+ * @property {Function} no
+ * @property {Function} on
+ * @property {Function} off
+ * @property {Function} call
+ * @property {Function} type
+ * @property {Function} typeClass
+ * @property {Function} error
  * */
 function typeFilter (value, options, type, className) {
   if (!options) return getType(value);
@@ -45,4 +75,20 @@ function typeFilter (value, options, type, className) {
   if (other) return other(value, type, className);
   return value
 }
+typeFilter.typeFilter = typeFilter;
+function setHandler (name) {
+  Object.defineProperty(typeFilter, name, {
+    get: function () {
+      return require('./handlers/' + name);
+    }
+  });
+}
+setHandler('yes');
+setHandler('no');
+setHandler('on');
+setHandler('off');
+setHandler('call');
+setHandler('type');
+setHandler('typeClass');
+setHandler('error');
 module.exports = typeFilter;

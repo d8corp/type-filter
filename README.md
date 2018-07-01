@@ -4,6 +4,17 @@
  - `handler` is a function
  - `handlerList` is an array of functions
  - `typeHandler` is an object of functions
+## install
+`npm i type-filter`
+## import
+```javascript
+import typeFilter, { yes } from 'type-filter'
+```
+or
+```javascript
+import { typeFilter, yes } from 'type-filter'
+```
+`yes` is a handler (see below)
 ## get type
 Use only one argument to get a type.
 ```javascript
@@ -65,7 +76,7 @@ typeFilter(1, [addOne, [square, square]]) // returns 16
 ## typeHandler
 ##### If the second argument of `typeFilter` is an object then this argument is typeHandler.
 keys of `typeHandler` equals type or class name of value.  
-values of `typeHandler` can contains `handler`, `handlerList` or `typeHandler`.  
+values of `typeHandler` can contain `handler`, `handlerList` or `typeHandler`.  
 if a `typeHandler` does not contain key which equals current value type or class name
 then `typeFilter` returns this value.
 
@@ -90,48 +101,85 @@ typeFilter('2', onlyNumber) // returns undefined
 ```
 
 ## default handlers
-you may use default handler from this library
+you may use default handlers from this library
 
+#### no
+always returns `undefined`
 ```javascript
-import typeFilter, {yes, no, on, off, type, typeClass, call} from 'type-filter'
-
 const noNumber = {
   number: no
 }
 typeFilter(1, noNumber) // returns undefined
 typeFilter('2', noNumber) // returns '2'
+```
 
+#### yes
+always returns value
+```javascript
 const onlyNumber = {
   number: yes,
   other: no
 }
 typeFilter(1, onlyNumber) // returns 1
 typeFilter('2', onlyNumber) // returns undefined
+```
 
-// to get true or false
+#### on, off
+`on` always returns true  
+`off` always returns false
+```javascript
 const isNumber = {
   number: on,
   other: off
 }
 typeFilter(1, isNumber) // returns true
 typeFilter('2', isNumber) // returns false
+```
 
-// to get type of value
+#### type
+`type` always returns type of value
+```javascript
 typeFilter('2', type) // returns 'string'
+```
 
-// to get type or class name of value
+#### typeClass
+`typeClass` returns type of value or className for type equals `class`
+```javascript
 typeFilter(new Map(), typeClass) // returns 'Map'
 typeFilter({}, typeClass) // returns 'object'
+```
 
-// to call value
+#### call
+`call` always returns result of value call 
+```javascript
 typeFilter(() => 1, call) // returns 1
 ```
 
-## minimize code
-to minimize code bundle use special loading
+#### error
+`error` runs exception
 ```javascript
-import typeFilter from 'type-filter/typeFilter'
-import yes from 'type-filter/yes'
-import no from 'type-filter/no'
+typeFilter(1, error('Text')) // runs throw Error('Text')
 ```
-and your code will not contain other default handlers
+you may use one of default variable (`value`, `type`, `className`) inside text of `error`'s argument
+```javascript
+// runs throw Error('value: 1, type: number, className: ')
+typeFilter(1, error('value: {value}, type: {type}, className: {className}'))
+```
+also you may use own properties
+```javascript
+typeFilter(1, error('error: {custom}', {
+  custom: 'custom value'
+})) // 'error: custom value'
+```
+if the custom value is a function it will be runs
+```javascript
+typeFilter(1, error('error: {custom}', {
+  custom: () => 'custom value'
+})) // 'error: custom value'
+```
+this custom property gets `value`, `type`, `className` as a handler
+```javascript
+typeFilter(1, error('error: {custom}', {
+  custom: (value, type, className) => `value: ${value}, type: ${type}, className: ${className}`
+})) // runs throw Error('value: 1, type: number, className: ')
+```
