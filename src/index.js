@@ -22,38 +22,41 @@ function getType (value) {
   return 'class'
 }
 /**
- * @callback typeFilterOptionsAsFunction
+ * @callback typeFilterCustomHandler
  * @param {*} value
  * @param {getTypeResult} type
  * @param {String} className
  * */
 /**
- * @typedef {Object} typeFilterOptionsAsObject
- * @property {typeFilterOptionsAsFunction} [undefined]
- * @property {typeFilterOptionsAsFunction} [string]
- * @property {typeFilterOptionsAsFunction} [number]
- * @property {typeFilterOptionsAsFunction} [boolean]
- * @property {typeFilterOptionsAsFunction} [function]
- * @property {typeFilterOptionsAsFunction} [null]
- * @property {typeFilterOptionsAsFunction} [array]
- * @property {typeFilterOptionsAsFunction} [object]
- * @property {typeFilterOptionsAsFunction} [symbol]
- * @property {typeFilterOptionsAsFunction} [class]
- * @property {typeFilterOptionsAsFunction} [other]
+ * @typedef {handler|yes|no|on|off|error|type|typeClass|call|typeFilterCustomHandler} typeFilterHandler
+/**
+ * @typedef {Object} typeHandler
+ * @property {typeHandler|Array|typeFilterHandler} [undefined]
+ * @property {typeHandler|Array|typeFilterHandler} [string]
+ * @property {typeHandler|Array|typeFilterHandler} [number]
+ * @property {typeHandler|Array|typeFilterHandler} [boolean]
+ * @property {typeHandler|Array|typeFilterHandler} [function]
+ * @property {typeHandler|Array|typeFilterHandler} [null]
+ * @property {typeHandler|Array|typeFilterHandler} [array]
+ * @property {typeHandler|Array|typeFilterHandler} [object]
+ * @property {typeHandler|Array|typeFilterHandler} [symbol]
+ * @property {typeHandler|Array|typeFilterHandler} [class]
+ * @property {typeHandler|Array|typeFilterHandler} [other]
  * */
 /**
  * @param {*} [value]
- * @param {typeFilterOptionsAsObject|typeFilterOptionsAsFunction|Array} [options]
+ * @param {typeHandler|typeFilterHandler|Array} [options]
  * @param {String} [type]
  * @param {String} [className]
- * @property {typeFilterOptionsAsFunction} yes
- * @property {typeFilterOptionsAsFunction} no
- * @property {typeFilterOptionsAsFunction} on
- * @property {typeFilterOptionsAsFunction} off
- * @property {typeFilterOptionsAsFunction} call
- * @property {typeFilterOptionsAsFunction} type
- * @property {typeFilterOptionsAsFunction} typeClass
- * @property {typeFilterOptionsAsFunction} error
+ * @property {yes} yes
+ * @property {no} no
+ * @property {on} on
+ * @property {off} off
+ * @property {call} call
+ * @property {type} type
+ * @property {typeClass} typeClass
+ * @property {error} error
+ * @property {handler} handler
  * */
 function typeFilter (value, options, type, className) {
   if (!options) return getType(value);
@@ -91,4 +94,5 @@ setHandler('call');
 setHandler('type');
 setHandler('typeClass');
 setHandler('error');
+setHandler('handler');
 module.exports = typeFilter;
