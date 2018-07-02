@@ -32,17 +32,17 @@ function getType (value) {
  * */
 /**
  * @typedef {Object} typeHandler
- * @property {handlers} [undefined]
- * @property {handlers} [string]
- * @property {handlers} [number]
- * @property {handlers} [boolean]
- * @property {handlers} [function]
- * @property {handlers} [null]
- * @property {handlers} [array]
- * @property {handlers} [object]
- * @property {handlers} [symbol]
- * @property {handlers} [class]
- * @property {handlers} [other]
+ * @property {typeHandler|typeFilterHandler|Array} [undefined]
+ * @property {typeHandler|typeFilterHandler|Array} [string]
+ * @property {typeHandler|typeFilterHandler|Array} [number]
+ * @property {typeHandler|typeFilterHandler|Array} [boolean]
+ * @property {typeHandler|typeFilterHandler|Array} [function]
+ * @property {typeHandler|typeFilterHandler|Array} [null]
+ * @property {typeHandler|typeFilterHandler|Array} [array]
+ * @property {typeHandler|typeFilterHandler|Array} [object]
+ * @property {typeHandler|typeFilterHandler|Array} [symbol]
+ * @property {typeHandler|typeFilterHandler|Array} [class]
+ * @property {typeHandler|typeFilterHandler|Array} [other]
  * */
 /**
  * @typedef {Object} options
@@ -51,11 +51,8 @@ function getType (value) {
  * @property {Boolean} [once]
  * */
 /**
- * @typedef {typeHandler|typeFilterHandler|Array} handlers
- * */
-/**
  * @param {*} [value]
- * @param {handlers} [handlers]
+ * @param {typeHandler|typeFilterHandler|Array} [handlers]
  * @param {options} [options]
  * @property {yes} yes
  * @property {no} no
