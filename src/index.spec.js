@@ -142,4 +142,12 @@ describe('typeFilter', function () {
       }))
     }).toThrow('field: field value, fieldAsFunction: value of field');
   });
+  it('once', () => {
+    const addOne = value => value + 1;
+    expect(typeFilter(1, [addOne, addOne, addOne])).toBe(4);
+    expect(typeFilter(1, [addOne, addOne, addOne], {once: true})).toBe(2);
+    expect(typeFilter(1, [no, off, type, type])).toBe('string'); // undefined > false > 'boolean' > 'string'
+    expect(typeFilter(new Map(), [no, off, type, typeClass], {once: true})).toBe('class');
+    expect(typeFilter(new Map(), [no, off, typeClass, type], {once: true})).toBe('Map');
+  });
 });

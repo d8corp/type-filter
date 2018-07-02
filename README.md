@@ -1,20 +1,22 @@
-# type-filter
-`typeFilter(value[, handler | handlerList | typeHandler ])`
+# type-filter (2.1.0)
+`typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
  - `handlerList` is an array of functions
  - `typeHandler` is an object of functions
+ 
+[npm](https://www.npmjs.com/package/type-filter) |
+[github](https://www.npmjs.com/package/type-filter)
 ## install
 `npm i type-filter`
 ## import
 ```javascript
-import typeFilter, { yes } from 'type-filter'
+import typeFilter, { handler } from 'type-filter'
 ```
 or
 ```javascript
-import { typeFilter, yes } from 'type-filter'
+import { typeFilter, handler } from 'type-filter'
 ```
-`yes` is a handler (see below)
 ## get type
 Use only one argument to get a type.
 ```javascript
@@ -100,6 +102,23 @@ typeFilter(1, onlyNumber) // returns 1
 typeFilter('2', onlyNumber) // returns undefined
 ```
 
+## options
+you may use this options to deep set up
+#### type, className
+if you already know type or className of value you may place them in options to have much performance
+#### once
+`handler` and `typeHandler` run only one handle but `handlerList` runs each handler inside it and
+each handler gets value equals result of previous handler.
+to have result of the first handler which returns some equals true use `once`
+```javascript
+const addOne = value => value + 1
+typeFilter(1, [addOne, addOne, addOne]) // returns 4
+typeFilter(1, [addOne, addOne, addOne], {once: true}) // returns 2
+typeFilter(1, [no, off, type, type]) // undefined > false > 'boolean' > 'string'
+typeFilter(new Map(), [no, off, type, typeClass], {once: true}) // returns 'class'
+typeFilter(new Map(), [no, off, typeClass, type], {once: true}) // returns 'Map'
+```
+
 ## default handlers
 you may use default handlers from this library
 
@@ -182,4 +201,17 @@ this custom property gets `value`, `type`, `className` as a handler
 typeFilter(1, error('error: {custom}', {
   custom: (value, type, className) => `value: ${value}, type: ${type}, className: ${className}`
 })) // runs throw Error('value: 1, type: number, className: ')
+```
+
+#### handler
+`handler` like bind method for a function but you may set up `handler` as default and use `value` later
+```javascript
+const isNumber = typeFilter({
+  number: on,
+  function: [call, isNumber],
+  other: off
+}, handler)
+isNumber(1) // returns true
+isNumber('1') // returns false
+isNumber(() => 1) // returns true
 ```

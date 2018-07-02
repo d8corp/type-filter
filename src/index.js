@@ -29,25 +29,34 @@ function getType (value) {
  * */
 /**
  * @typedef {handler|yes|no|on|off|error|type|typeClass|call|typeFilterCustomHandler} typeFilterHandler
+ * */
 /**
  * @typedef {Object} typeHandler
- * @property {typeHandler|Array|typeFilterHandler} [undefined]
- * @property {typeHandler|Array|typeFilterHandler} [string]
- * @property {typeHandler|Array|typeFilterHandler} [number]
- * @property {typeHandler|Array|typeFilterHandler} [boolean]
- * @property {typeHandler|Array|typeFilterHandler} [function]
- * @property {typeHandler|Array|typeFilterHandler} [null]
- * @property {typeHandler|Array|typeFilterHandler} [array]
- * @property {typeHandler|Array|typeFilterHandler} [object]
- * @property {typeHandler|Array|typeFilterHandler} [symbol]
- * @property {typeHandler|Array|typeFilterHandler} [class]
- * @property {typeHandler|Array|typeFilterHandler} [other]
+ * @property {handlers} [undefined]
+ * @property {handlers} [string]
+ * @property {handlers} [number]
+ * @property {handlers} [boolean]
+ * @property {handlers} [function]
+ * @property {handlers} [null]
+ * @property {handlers} [array]
+ * @property {handlers} [object]
+ * @property {handlers} [symbol]
+ * @property {handlers} [class]
+ * @property {handlers} [other]
+ * */
+/**
+ * @typedef {Object} options
+ * @property {String} [className]
+ * @property {getTypeResult|String} [type]
+ * @property {Boolean} [once]
+ * */
+/**
+ * @typedef {typeHandler|typeFilterHandler|Array} handlers
  * */
 /**
  * @param {*} [value]
- * @param {typeHandler|typeFilterHandler|Array} [options]
- * @param {String} [type]
- * @param {String} [className]
+ * @param {handlers} [handlers]
+ * @param {options} [options]
  * @property {yes} yes
  * @property {no} no
  * @property {on} on
@@ -58,23 +67,34 @@ function getType (value) {
  * @property {error} error
  * @property {handler} handler
  * */
-function typeFilter (value, options, type, className) {
-  if (!options) return getType(value);
-  if (options instanceof Array) {
-    return options.reduce(function (value, handler) {
-      return typeFilter(value, handler)
+function typeFilter (value, handlers, options) {
+  if (!options) {
+    options = {}
+  }
+  if (!handlers) return getType(value);
+  if (handlers instanceof Array) {
+    if (options.once) {
+      for (let i = 0; i < handlers.length; i++) {
+        var result = typeFilter(value, handlers[i], options);
+        if (result) {
+          return result
+        }
+      }
+    }
+    return handlers.reduce(function (value, handler) {
+      return typeFilter(value, handler, options)
     }, value)
   }
-  if (type === undefined) {
-    type = getType(value);
-  }
-  if (className === undefined) {
-    className = type === 'class' ? value.constructor.name : '';
-  }
-  if (typeof options === 'function') return options(value, type, className);
-  var handler = options[className || type];
-  if (handler) return typeFilter(value, handler, type, className);
-  var other = options.other;
+  var type = options.type || getType(value);
+  var className = options.className || (type === 'class' ? value.constructor.name : '');
+  if (typeof handlers === 'function') return handlers(value, type, className);
+  var handler = handlers[className || type];
+  if (handler) return typeFilter(value, handler, {
+    type: type,
+    className: className,
+    once: options.once
+  });
+  var other = handlers.other;
   if (other) return other(value, type, className);
   return value
 }
