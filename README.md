@@ -6,7 +6,7 @@
  - `typeHandler` is an object of functions
  
 [npm](https://www.npmjs.com/package/type-filter) |
-[github](https://www.npmjs.com/package/type-filter)
+[github](https://github.com/d8corp/type-filter)
 ## install
 `npm i type-filter`
 ## import
