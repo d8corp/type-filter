@@ -29,7 +29,6 @@ function getType (value) {
  * */
 /**
  * @typedef {handler|yes|no|on|off|error|type|typeClass|call|typeFilterCustomHandler} typeFilterHandler
- * */
 /**
  * @typedef {Object} typeHandler
  * @property {typeHandler|typeFilterHandler|Array} [undefined]
@@ -43,7 +42,6 @@ function getType (value) {
  * @property {typeHandler|typeFilterHandler|Array} [symbol]
  * @property {typeHandler|typeFilterHandler|Array} [class]
  * @property {typeHandler|typeFilterHandler|Array} [other]
- * */
 /**
  * @typedef {Object} options
  * @property {String} [className]
