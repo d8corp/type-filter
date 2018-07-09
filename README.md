@@ -1,4 +1,4 @@
-# type-filter (2.2.1)
+# type-filter (2.2.2)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, handlerListType ])`
  - `value` is any type
  - `handler` is a function
@@ -110,10 +110,12 @@ typeFilter(1, onlyNumber) // returns 1
 typeFilter('2', onlyNumber) // returns undefined
 ```
 ## handlerListType
-`handler` and `typeHandler` run only one handle but `handlerList` runs each handler inside it and
-each handler gets value equals result of previous handler.
-to have result of the first handler in `handlerList` which returns needed result you may use `handlerListType`
-if the third argument equals `true` of `function` then each handler gets original value.
+*`handler` and `typeHandler` run only one handle but `handlerList` runs each handler inside it and
+each handler gets value equals result of previous handler. to have result of the first handler in `handlerList`
+which returns needed result you may use `handlerListType`.*
+  
+if the third argument equals `true` or `function` then each handler gets original value.  
+
 if the third argument equals `true` the typeFilter returns a result of the first handler
 which returns some equals `true` (`1`, `true`, `{}`, `[]`, ...).
 ```javascript
