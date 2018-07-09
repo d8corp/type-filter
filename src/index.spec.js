@@ -7,13 +7,15 @@ var yes = typeFilter.yes,
     call = typeFilter.call,
     type = typeFilter.type,
     typeClass = typeFilter.typeClass,
-    error = typeFilter.error;
+    error = typeFilter.error,
+    recheck = typeFilter.recheck,
+    handler = typeFilter.handler;
 
 function MyClass () {}
+var MyClass1 = MyClass;
 
 describe('typeFilter', function () {
   it('get type', function () {
-    // use only one argument to get its type
     expect(typeFilter(undefined)).toBe('undefined');
     expect(typeFilter(1)).toBe('number');
     expect(typeFilter(NaN)).toBe('nan');
@@ -29,25 +31,20 @@ describe('typeFilter', function () {
     expect(typeFilter()).toBe('undefined');
   });
   it('handler', function () {
-    // if the second argument is handler then the handler is always used on first argument
     function addOne (value) {
       return value + 1
     }
     expect(typeFilter(1, addOne)).toBe(2);
-    // a handler gets 3 arguments: value, type and className
     function getType (value, type) {
       return value + ': ' + type
     }
     expect(typeFilter(1, getType)).toBe('1: number');
-    // 3th argument is className and returns empty string for all types except for class
     function getTypeOrClassName (value, type, className) {
-      return value + ': ' + type + (className ? '(' + className + ')' : className)
+      return value + ': ' + type + (className && '(' + className + ')')
     }
     expect(typeFilter({}, getTypeOrClassName)).toBe('[object Object]: object');
     expect(typeFilter(new MyClass(), getTypeOrClassName)).toBe('[object Object]: class(MyClass)');
-    const CustomClass = function () {};
-    const MyCustomClass = CustomClass;
-    expect(typeFilter(new MyCustomClass(), getTypeOrClassName)).toBe('[object Object]: class(CustomClass)');
+    expect(typeFilter(new MyClass1(), getTypeOrClassName)).toBe('[object Object]: class(MyClass)');
   });
   it('handlerList', function () {
     function addOne (value) {
@@ -65,59 +62,37 @@ describe('typeFilter', function () {
     expect(typeFilter('1', [toInt, [addOne, [addOne]]])).toBe(3);
     expect(typeFilter(1, [toString, [addOneFromString, [addOne]]])).toBe(3);
   });
-  it('default handlers', () => {
-    // yes always returns the first argument of typeFilter
-    expect(typeFilter(1, yes)).toBe(1);
-    // no always returns undefined
-    expect(typeFilter(1, no)).toBe(undefined);
-    // on always returns true
-    expect(typeFilter(1, on)).toBe(true);
-    // off always returns false
-    expect(typeFilter(1, off)).toBe(false);
-    // type always returns type of value
-    expect(typeFilter(1, type)).toBe('number');
-    expect(typeFilter(new MyClass(), type)).toBe('class');
-    // typeClass returns type of value for all types except for class, this case it returns class name
-    expect(typeFilter(1, typeClass)).toBe('number');
-    expect(typeFilter(new MyClass(), typeClass)).toBe('MyClass');
-    // call returns the function result
-    expect(typeFilter(function () {return 1}, call)).toBe(1);
-    // you may use combine to have some handlers
-    function addOne (value) {return value + 1}
-    expect(typeFilter(function () {return 2}, [call, addOne])).toBe(3);
-    // combine unfolds all array arguments
-    expect(typeFilter(function () {return 3}, [call, [addOne]])).toBe(4);
-  });
-  it('type filtering', () => {
-    const numberBlock = {
-      number: no // all types pass except for number
+  it('typeHandler', function () {
+    var numberBlock = {
+      number: no
     };
     expect(typeFilter(1, numberBlock)).toBe(undefined);
     expect(typeFilter('1', numberBlock)).toBe('1');
     expect(typeFilter(null, numberBlock)).toBe(null);
   });
-  it('other', () => {
-    const options = {
+  it('other', function () {
+    var onlyNumber = {
       number: yes,
       other: no
     };
-    expect(typeFilter(1, options)).toBe(1);
-    expect(typeFilter('1', options)).toBe(undefined);
-    expect(typeFilter(null, options)).toBe(undefined);
+    expect(typeFilter(1, onlyNumber)).toBe(1);
+    expect(typeFilter('1', onlyNumber)).toBe(undefined);
+    expect(typeFilter(null, onlyNumber)).toBe(undefined);
   });
-  it('class name filter', () => {
-    const onlyMap = {
-      Map: yes,
+  it('class name filter', function () {
+    var onlyError = {
+      Error: yes,
       other: no
     };
-    expect(typeFilter(new Map(), onlyMap)).toEqual(new Map());
-    expect(typeFilter(new Set(), onlyMap)).toBe(undefined);
+    expect(typeFilter(new Error(), onlyError)).toEqual(new Error());
+    expect(typeFilter(new MyClass(), onlyError)).toBe(undefined);
   });
-  it('actions', () => {
-    // you may use handlers like actions to do something for some type
-    const call = jest.fn();
-    const options = {
-      string: value => call(value)
+  it('actions', function () {
+    var call = jest.fn();
+    var options = {
+      string: function (value) {
+        call(value)
+      }
     };
     expect(call.mock.calls.length).toBe(0);
     typeFilter(1, options);
@@ -126,7 +101,100 @@ describe('typeFilter', function () {
     expect(call.mock.calls.length).toBe(1);
     expect(call.mock.calls[0][0]).toBe('1');
   });
-  it('error', () => {
+  it('once', function () {
+    function addOne (value) {
+      return value + 1
+    }
+    function addTwo (value) {
+      return value + 2
+    }
+    function addThree (value) {
+      return value + 3
+    }
+    expect(typeFilter(1, [addOne, addTwo, addThree])).toBe(7);
+    expect(typeFilter(1, [addOne, addTwo, addThree], true)).toBe(2);
+    expect(typeFilter(1, [addOne, addTwo, addThree], function (value) {
+      return value > 2
+    })).toBe(3);
+    expect(typeFilter(1, [addOne, addTwo, addThree], function (value) {
+      return value > 4
+    })).toBe(undefined);
+    expect(typeFilter(1, [no, off, type, type])).toBe('string');
+    expect(typeFilter(0, [yes], true)).toBe(undefined);
+    expect(typeFilter(new MyClass(), [no, off, type, typeClass], true)).toBe('class');
+    expect(typeFilter(new MyClass(), [no, off, typeClass, type], true)).toBe('MyClass');
+  });
+  it('default handler: no', function () {
+    expect(typeFilter(1, no)).toBe(undefined);
+    var noNumber = {
+      number: no
+    };
+    expect(typeFilter(1, noNumber)).toBe(undefined);
+    expect(typeFilter('2', noNumber)).toBe('2');
+  });
+  it('default handler: yes', function () {
+    expect(typeFilter(1, yes)).toBe(1);
+    var onlyNumber = {
+      number: yes,
+      other: no
+    };
+    expect(typeFilter(1, onlyNumber)).toBe(1);
+    expect(typeFilter('2', onlyNumber)).toBe(undefined);
+  });
+  it('default handler: on, off', function () {
+    expect(typeFilter(1, on)).toBe(true);
+    expect(typeFilter(1, off)).toBe(false);
+    var isNumber = {
+      number: on,
+      other: off
+    };
+    expect(typeFilter(1, isNumber)).toBe(true);
+    expect(typeFilter('2', isNumber)).toBe(false);
+  });
+  it('default handler: type', function () {
+    expect(typeFilter(undefined, type)).toBe('undefined');
+    expect(typeFilter(1, type)).toBe('number');
+    expect(typeFilter(NaN, type)).toBe('nan');
+    expect(typeFilter('1', type)).toBe('string');
+    expect(typeFilter(false, type)).toBe('boolean');
+    expect(typeFilter(function () {}, type)).toBe('function');
+    expect(typeFilter([], type)).toBe('array');
+    expect(typeFilter({}, type)).toBe('object');
+    expect(typeFilter(Object.create(null), type)).toBe('object');
+    expect(typeFilter(null, type)).toBe('null');
+    expect(typeFilter(new MyClass(), type)).toBe('class');
+    expect(typeFilter(new Error(), type)).toBe('class');
+  });
+  it('default handler: typeClass', function () {
+    expect(typeFilter(new MyClass(), typeClass)).toBe('MyClass');
+    expect(typeFilter(1, typeClass)).toBe('number');
+  });
+  it('default handler: call', function () {
+    expect(typeFilter(function () {
+      return 1
+    }, call)).toBe(1);
+  });
+  it('default handler: recheck', function () {
+    var isNumberHandler = {
+      function: [call, recheck],
+      number: on,
+      other: off
+    };
+    expect(typeFilter(1, isNumberHandler)).toBe(true);
+    expect(typeFilter('1', isNumberHandler)).toBe(false);
+    expect(typeFilter(function () {
+      return 1
+    }, isNumberHandler)).toBe(true);
+    expect(typeFilter(function () {
+      return '1'
+    }, isNumberHandler)).toBe(false);
+    expect(typeFilter(function () {
+      return function () {
+        return 1
+      }
+    }, isNumberHandler)).toBe(true);
+  });
+  it('default handler: error', function () {
     expect(function () {
       typeFilter(1, error('Error text'))
     }).toThrow('Error text');
@@ -142,12 +210,37 @@ describe('typeFilter', function () {
       }))
     }).toThrow('field: field value, fieldAsFunction: value of field');
   });
-  it('once', () => {
-    const addOne = value => value + 1;
-    expect(typeFilter(1, [addOne, addOne, addOne])).toBe(4);
-    expect(typeFilter(1, [addOne, addOne, addOne], {once: true})).toBe(2);
-    expect(typeFilter(1, [no, off, type, type])).toBe('string'); // undefined > false > 'boolean' > 'string'
-    expect(typeFilter(new Map(), [no, off, type, typeClass], {once: true})).toBe('class');
-    expect(typeFilter(new Map(), [no, off, typeClass, type], {once: true})).toBe('Map');
+  it('default handler: handler', function () {
+    let isNumber = typeFilter({
+      number: on,
+      other: off,
+      function: [call, recheck]
+    }, handler);
+    expect(isNumber(1)).toBe(true);
+    expect(isNumber('1')).toBe(false);
+    expect(isNumber(function () {
+      return 1
+    })).toBe(true);
+    expect(isNumber(function () {
+      return '1'
+    })).toBe(false);
+
+    function getFilter (value) {
+      return typeFilter(value, {
+        array: handler,
+        function: handler,
+        object: handler,
+        other: error('value has wrong type which equals {type}')
+      });
+    }
+    isNumber = getFilter({
+      number: on,
+      other: off
+    });
+    expect(isNumber(1)).toBe(true);
+    expect(isNumber('1')).toBe(false);
+    expect(function () {
+      getFilter(1)
+    }).toThrow('value has wrong type which equals number');
   });
 });

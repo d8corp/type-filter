@@ -1,3 +1,4 @@
+var yes = require('./handlers/yes');
 /**
  * @typedef {'null'|'undefined'|'string'|'number'|'boolean'|'function'|'object'|'array'|'class'|'nan'} getTypeResult
  * */
@@ -28,7 +29,7 @@ function getType (value) {
  * @param {String} className
  * */
 /**
- * @typedef {handler|yes|no|on|off|error|type|typeClass|call|typeFilterCustomHandler} typeFilterHandler
+ * @typedef {handler|yes|no|on|off|error|type|typeClass|call|recheck|typeFilterCustomHandler} typeFilterHandler
 /**
  * @typedef {Object} typeHandler
  * @property {typeHandler|typeFilterHandler|Array} [undefined]
@@ -61,23 +62,48 @@ function getType (value) {
  * @property {typeClass} typeClass
  * @property {error} error
  * @property {handler} handler
+ * @property {recheck} recheck
  * */
 function typeFilter (value, handlers, options) {
-  if (!options) {
-    options = {}
-  }
   if (!handlers) return getType(value);
+  if (handlers === recheck) {
+    if (!options || !options.heightHandler) {
+      throw Error('you can not use recheck as main handler')
+    }
+    return typeFilter(value, options.heightHandler, options);
+  }
+  if (options === true) {
+    options = {
+      once: true,
+      heightHandler: handlers
+    }
+  } else if (typeof options === 'function') {
+    options = {
+      once: options,
+      heightHandler: handlers
+    }
+  } else if (!options) {
+    options = {
+      heightHandler: handlers
+    }
+  }
   if (handlers instanceof Array) {
-    if (options.once) {
+    var once = options.once;
+    if (once) {
+      var checkOnce = typeof once === 'function' ? once : yes;
       for (let i = 0; i < handlers.length; i++) {
         var result = typeFilter(value, handlers[i], options);
-        if (result) {
+        if (checkOnce(result)) {
           return result
         }
       }
+      return undefined
     }
+    var reduceOptions = {
+      heightHandler: options.heightHandler
+    };
     return handlers.reduce(function (value, handler) {
-      return typeFilter(value, handler, options)
+      return typeFilter(value, handler, reduceOptions)
     }, value)
   }
   var type = options.type || getType(value);
@@ -87,7 +113,8 @@ function typeFilter (value, handlers, options) {
   if (handler) return typeFilter(value, handler, {
     type: type,
     className: className,
-    once: options.once
+    once: options.once,
+    heightHandler: options.heightHandler
   });
   var other = handlers.other;
   if (other) return other(value, type, className);
@@ -101,7 +128,9 @@ function setHandler (name) {
     }
   });
 }
-setHandler('yes');
+var recheck = {};
+typeFilter.recheck = recheck;
+typeFilter.yes = yes;
 setHandler('no');
 setHandler('on');
 setHandler('off');
