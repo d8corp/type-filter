@@ -1,11 +1,10 @@
-# type-filter (2.2.0)
+# type-filter (2.2.1)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, handlerListType ])`
  - `value` is any type
  - `handler` is a function
  - `handlerList` is an array
  - `typeHandler` is an object
  - `handlerListType` is boolean or function
- - `options` is an object
  
 [npm](https://www.npmjs.com/package/type-filter) |
 [github](https://github.com/d8corp/type-filter)
