@@ -1,6 +1,5 @@
-var yes = require('./handlers/yes');
 /**
- * @typedef {'null'|'undefined'|'string'|'number'|'boolean'|'function'|'object'|'array'|'class'|'nan'} getTypeResult
+ * @typedef {'null'|'undefined'|'string'|'number'|'boolean'|'function'|'object'|'array'|'class'|'nan'|String} getTypeResult
  * */
 /** @return {getTypeResult} */
 function getType (value) {
@@ -25,8 +24,7 @@ function getType (value) {
 /**
  * @callback typeFilterCustomHandler
  * @param {*} value
- * @param {getTypeResult} type
- * @param {String} className
+ * @param {{once: *, rootHandler: typeHandler|typeFilterHandler|Array, type: getTypeResult, className: String}} options
  * */
 /**
  * @typedef {handler|yes|no|on|off|error|type|typeClass|call|recheck|typeFilterCustomHandler} typeFilterHandler
@@ -44,11 +42,13 @@ function getType (value) {
  * @property {typeHandler|typeFilterHandler|Array} [class]
  * @property {typeHandler|typeFilterHandler|Array} [other]
 /**
- * @typedef {Object} options
+ * @typedef {Object|Function} options
  * @property {String} [className]
- * @property {getTypeResult|String} [type]
- * @property {Boolean} [once]
- * */
+ * @property {getTypeResult} [type]
+ * @property {Boolean|Function} [once]
+ * @property {typeHandler|typeFilterHandler|Array} [rootHandler]
+ * @property {typeHandler|typeFilterHandler|Array} [handler]
+ */
 /**
  * @param {*} [value]
  * @param {typeHandler|typeFilterHandler|Array} [handlers]
@@ -66,25 +66,29 @@ function getType (value) {
  * */
 function typeFilter (value, handlers, options) {
   if (!handlers) return getType(value);
-  if (handlers === recheck) {
-    if (!options || !options.heightHandler) {
-      throw Error('you can not use recheck as main handler')
-    }
-    return typeFilter(value, options.heightHandler, options);
-  }
+  var optionsType = typeof options;
   if (options === true) {
     options = {
-      once: true,
-      heightHandler: handlers
+      once: yes,
+      rootHandler: handlers
     }
-  } else if (typeof options === 'function') {
+  } else if (optionsType === 'function') {
     options = {
-      once: options,
-      heightHandler: handlers
+      once: typeFilter([options, {
+        function: [call, recheck]
+      }], handler, {
+        rootHandler: options.rootHandler || handlers
+      }),
+      rootHandler: handlers
     }
-  } else if (!options) {
+  } else if (optionsType === 'object') {
     options = {
-      heightHandler: handlers
+      once: options.once,
+      rootHandler: options.rootHandler || handlers
+    }
+  } else {
+    options = {
+      rootHandler: handlers
     }
   }
   if (handlers instanceof Array) {
@@ -100,27 +104,45 @@ function typeFilter (value, handlers, options) {
       return undefined
     }
     var reduceOptions = {
-      heightHandler: options.heightHandler
+      rootHandler: options.rootHandler,
+      once: options.once
     };
     return handlers.reduce(function (value, handler) {
       return typeFilter(value, handler, reduceOptions)
     }, value)
   }
-  var type = options.type || getType(value);
-  var className = options.className || (type === 'class' ? value.constructor.name : '');
-  if (typeof handlers === 'function') return handlers(value, type, className);
-  var handler = handlers[className || type];
-  if (handler) return typeFilter(value, handler, {
-    type: type,
-    className: className,
-    once: options.once,
-    heightHandler: options.heightHandler
-  });
+  var type = options.type || (options.type = getType(value));
+  var className = options.className;
+  className = typeof className === 'string' ? className : options.className = type === 'class' ? value.constructor.name : '';
+  if (typeof handlers === 'function') {
+    options.handler = handlers;
+    return handlers(value, options);
+  }
+  var currentHandler = handlers[className || type];
+  if (currentHandler) return typeFilter(value, currentHandler, options);
   var other = handlers.other;
-  if (other) return other(value, type, className);
+  if (other) return other(value, options);
   return value
 }
+module.exports = typeFilter;
 typeFilter.typeFilter = typeFilter;
+// main handlers
+var yes = require('./handlers/yes');
+var on = require('./handlers/on');
+var handler = require('./handlers/handler');
+var call = require('./handlers/call');
+var recheck = require('./handlers/recheck');
+typeFilter.recheck = recheck;
+typeFilter.yes = yes;
+typeFilter.call = call;
+typeFilter.handler = handler;
+typeFilter.on = on;
+// custom handlers
+setHandler('no');
+setHandler('off');
+setHandler('type');
+setHandler('typeClass');
+setHandler('error');
 function setHandler (name) {
   Object.defineProperty(typeFilter, name, {
     get: function () {
@@ -128,15 +150,3 @@ function setHandler (name) {
     }
   });
 }
-var recheck = {};
-typeFilter.recheck = recheck;
-typeFilter.yes = yes;
-setHandler('no');
-setHandler('on');
-setHandler('off');
-setHandler('call');
-setHandler('type');
-setHandler('typeClass');
-setHandler('error');
-setHandler('handler');
-module.exports = typeFilter;

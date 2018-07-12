@@ -1,6 +1,6 @@
-var typeFilter = require('../index');
-module.exports = function handler (handler) {
-  return function (value) {
-    return typeFilter(value, handler)
+var typeFilter = require('../index.js');
+module.exports = function handler (handler, options) {
+  return options.rootHandler = function (value) {
+    return typeFilter(value, handler, options)
   }
 };

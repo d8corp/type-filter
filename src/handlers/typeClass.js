@@ -1,3 +1,3 @@
-module.exports = function typeClass (value, type, className) {
-  return className || type
+module.exports = function typeClass (value, options) {
+  return options.className || options.type
 };

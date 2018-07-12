@@ -35,12 +35,12 @@ describe('typeFilter', function () {
       return value + 1
     }
     expect(typeFilter(1, addOne)).toBe(2);
-    function getType (value, type) {
-      return value + ': ' + type
+    function getType (value, options) {
+      return value + ': ' + options.type
     }
     expect(typeFilter(1, getType)).toBe('1: number');
-    function getTypeOrClassName (value, type, className) {
-      return value + ': ' + type + (className && '(' + className + ')')
+    function getTypeOrClassName (value, options) {
+      return value + ': ' + options.type + (options.className && '(' + options.className + ')')
     }
     expect(typeFilter({}, getTypeOrClassName)).toBe('[object Object]: object');
     expect(typeFilter(new MyClass(), getTypeOrClassName)).toBe('[object Object]: class(MyClass)');
@@ -242,5 +242,17 @@ describe('typeFilter', function () {
     expect(function () {
       getFilter(1)
     }).toThrow('value has wrong type which equals number');
+
+    expect(typeFilter('1', typeFilter(() => ({
+      string: [value => parseInt(value), recheck],
+      function: [call, recheck],
+      number: value => value + 1,
+      other: yes
+    }), {
+      function: [call, recheck],
+      object: handler,
+      array: handler,
+      other: () => () => {}
+    }))).toBe(2);
   });
 });

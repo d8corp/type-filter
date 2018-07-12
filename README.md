@@ -1,10 +1,10 @@
-# type-filter (2.2.2)
-`typeFilter([ value ] [, handler | handlerList | typeHandler ] [, handlerListType ])`
+# type-filter (3.0.0)
+`typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
  - `handlerList` is an array
  - `typeHandler` is an object
- - `handlerListType` is boolean or function
+ - `options` is boolean or function or object
  
 [npm](https://www.npmjs.com/package/type-filter) |
 [github](https://github.com/d8corp/type-filter)
@@ -39,23 +39,23 @@ typeFilter() // returns 'undefined'
 
 ## handler
 ##### If the second argument of `typeFilter` is a function then it will be used as a `handler`.   
-Any handler gets 3 arguments: `value`, `type` and `className`.
+Any handler gets 2 arguments: `value` and `options`.
 
 `value` equals the first argument of `typeFilter`.
 ```javascript
 const handler = value => value + 1
 typeFilter(1, handler) // returns 2
 ```
-`type` equals what `typeFilter` returns for current `value` (*see get type*)
+`options.type` equals what `typeFilter` returns for current `value` (*see get type*)
 ```javascript
-const type = (value, type) => value + ': ' + type
+const type = (value, {type}) => value + ': ' + type
 typeFilter(1, type) // returns '1: number'
 typeFilter('1', type) // returns '1: string'
 ```
-`className` equals empty string for all types except for `class`.  
-If the `type` equals `class` then `className` contains name of class.
+`options.className` equals empty string for all types except for `class`.  
+If the `type` equals `class` then `options.className` contains name of class.
 ```javascript
-const classType = (value, type, className) => {
+const classType = (value, {type, className}) => {
   return value + ': ' + type + (className && '(' + className + ')')
 }
 typeFilter(1, classType) // returns '1: number'
@@ -65,7 +65,7 @@ typeFilter(new class MyClass {}, classType) // returns '[object Object]: class(M
 ```
 
 ## handlerList
-##### If the second argument of `typeFilter` is an array then this argument is handlerList.
+##### If the second argument of `typeFilter` is an array then this argument is `handlerList`.
 `handlerList` can contain `handler`, `handlerList` or `typeHandler`.
 
 ```javascript
@@ -77,7 +77,7 @@ typeFilter(1, [addOne, [square, square]]) // returns 16
 ```
 
 ## typeHandler
-##### If the second argument of `typeFilter` is an object then this argument is typeHandler.
+##### If the second argument of `typeFilter` is an object then this argument is `typeHandler`.
 keys of `typeHandler` equals type or class name of value.  
 values of `typeHandler` can contain `handler`, `handlerList` or `typeHandler`.  
 if a `typeHandler` does not contain key which equals current value type or class name
@@ -100,7 +100,6 @@ typeFilter(new Set(), noMap) // returns instance of Set
 
 ## other in typeHandler
 you may use other key of `typeHandler` to handle other types
-
 ```javascript
 const onlyNumber = {
   number: value => value,
@@ -109,21 +108,26 @@ const onlyNumber = {
 typeFilter(1, onlyNumber) // returns 1
 typeFilter('2', onlyNumber) // returns undefined
 ```
-## handlerListType
-*`handler` and `typeHandler` run only one handle but `handlerList` runs each handler inside it and
-each handler gets value equals result of previous handler. to have result of the first handler in `handlerList`
-which returns needed result you may use `handlerListType`.*
+## once
+*`handler` and `typeHandler` run only one handle but `handlerList` runs
+each handler inside it and
+each handler gets value which equals result of previous handler.
+to have result of the first handler in `handlerList`
+which returns needed result you may use `once`.*
   
-if the third argument equals `true` or `function` then each handler gets original value.  
+if the third argument (or `once` key of the third argument) equals `true` or `function`
+then each handler gets original value.  
 
-if the third argument equals `true` the typeFilter returns a result of the first handler
+if the third argument (or `once` key of the third argument)
+equals `true` the typeFilter returns a result of the first handler
 which returns some equals `true` (`1`, `true`, `{}`, `[]`, ...).
 ```javascript
 typeFilter(1, [no, off, type, yes]) // undefined > false > 'boolean' > 'string'
 typeFilter(1, [no, off, type, yes], true) // returns result of the type ('number')
 typeFilter(1, [no, off, yes, type], true) // returns result of the yes (1)
 ``` 
-if the third argument equals `function` the `function` gets result of handlerList's handlers call
+if the third argument (or `once` key of the third argument)
+equals `function` the `function` gets result of handlerList's handler call
 and the typeFilter returns a result which pass the `function` test. to pass the test the `function`
 should returns some equals `true` (`1`, `true`, `{}`, `[]`, ...).
 ```javascript
@@ -276,3 +280,8 @@ isNumber(1) // true
 isNumber('1') // false
 getFilter(1) // error: handler has wrong type which equals number
 ```
+
+##change list
+#### 3.0.0
+now the second argument of any handler is object which contains
+`type`, `className`, `handler`, `once`, `rootHandler`

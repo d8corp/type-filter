@@ -1,3 +1,3 @@
-module.exports = function type (value, type) {
-  return type
+module.exports = function type (value, options) {
+  return options.type
 };
