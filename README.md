@@ -1,4 +1,4 @@
-# type-filter (3.1.0)
+# type-filter (3.1.1)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -267,7 +267,7 @@ typeFilter(1, error('error: {custom}', {
 this custom property gets `value`, `type`, `className` as a handler
 ```javascript
 typeFilter(1, error('error: {custom}', {
-  custom: (value, type, className) => `value: ${value}, type: ${type}, className: ${className}`
+  custom: (value, {type, className}) => `value: ${value}, type: ${type}, className: ${className}`
 })) // runs throw Error('value: 1, type: number, className: ')
 ```
 
@@ -301,6 +301,8 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 
 ##change list
+#### 3.1.1
+clearing code
 #### 3.1.0
 now all options in handlers are the same object which you pass to the third argument of `typeFilter`
 #### 3.0.0

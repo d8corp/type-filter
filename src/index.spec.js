@@ -61,6 +61,10 @@ describe('typeFilter', function () {
     expect(typeFilter('1', [addOne, toInt])).toBe(11);
     expect(typeFilter('1', [toInt, [addOne, [addOne]]])).toBe(3);
     expect(typeFilter(1, [toString, [addOneFromString, [addOne]]])).toBe(3);
+    expect(typeFilter(1, [
+      () => new Map(),
+      (value, {type, className}) => `${value}: type - ${type}, className - ${className}`
+    ])).toBe('[object Map]: type - class, className - Map');
   });
   it('typeHandler', function () {
     var numberBlock = {
@@ -198,6 +202,9 @@ describe('typeFilter', function () {
     expect(function () {
       typeFilter(1, error('Error text'))
     }).toThrow('Error text');
+    expect(function () {
+      typeFilter(1, error('Error text {custom}'))
+    }).toThrow('Error text {custom}');
     expect(function () {
       typeFilter(1, error('value: {value}, type: {type}, className: {className}'))
     }).toThrow('value: 1, type: number, className: ');

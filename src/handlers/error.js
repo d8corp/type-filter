@@ -1,14 +1,17 @@
+function getProperty (key, data, options, value) {
+  if (key === 'value') return value;
+  if (data.hasOwnProperty(key)) return data[key];
+  if (options.hasOwnProperty(key)) return options[key];
+  return '{' + key + '}'
+}
 module.exports = function error (text, data) {
   if (typeof data !== 'object') {
     data = {}
   }
   return function (value, options) {
-    data.value = value;
-    data.type = options.type;
-    data.className = options.className;
     throw Error(text.replace(/{([a-zA-Z0-9]+)}/g, function (placeholder, placeholderId) {
-      var field = data[placeholderId];
-      return typeof field === 'function' ? field(value, options.type, options.className) : data.hasOwnProperty(placeholderId) ? field : placeholder;
+      var field = getProperty(placeholderId, data, options, value);
+      return typeof field === 'function' ? field(value, options) : field;
     }))
   }
 };
