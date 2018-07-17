@@ -255,4 +255,19 @@ describe('typeFilter', function () {
       other: () => () => {}
     }))).toBe(2);
   });
+  it('custom options', function () {
+    const deep = (value, options) => {
+      const deep = options.deep || 0;
+      options.deep = deep + 1;
+      return value
+    };
+    let deepHandler = {
+      function: [deep, call, recheck],
+      other: (value, {deep}) => deep || 0
+    };
+    expect(typeFilter(1, deepHandler)).toBe(0);
+    expect(typeFilter(() => 1, deepHandler)).toBe(1);
+    expect(typeFilter(() => () => 1, deepHandler)).toBe(2);
+    expect(typeFilter(() => () => 1, deepHandler, {deep: 1})).toBe(3);
+  });
 });

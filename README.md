@@ -1,4 +1,4 @@
-# type-filter (3.0.0)
+# type-filter (3.1.0)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -148,6 +148,25 @@ typeFilter(1, [yes, on, off], () => false) // returns undefined
 typeFilter(0, yes, true) // returns 0
 typeFilter(0, [yes], true) // returns undefined
 ```
+## options
+you may use the third argument as options which can contain
+`type`, `classType`, `once`, `rootHandler` like the second argument of handler.  
+each handler get the same `options` object and you can share variables between handlers
+```javascript
+const deep = (value, options) => {
+  const deep = options.deep || 0
+  options.deep = deep + 1
+  return value
+}
+const deepHandler = {
+  function: [deep, call, recheck],
+  other: (value, {deep}) => deep || 0
+}
+typeFilter(1, deepHandler) // returns 0
+typeFilter(() => 1, deepHandler) // returns 1
+typeFilter(() => () => 1, deepHandler) // returns 2
+typeFilter(() => () => 1, deepHandler, {deep: 1}) // returns 3
+``` 
 
 ## default handlers
 you may use default handlers from this library
@@ -282,6 +301,8 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 
 ##change list
+#### 3.1.0
+now all options in handlers are the same object which you pass to the third argument of `typeFilter`
 #### 3.0.0
 now the second argument of any handler is object which contains
 `type`, `className`, `handler`, `once`, `rootHandler`
