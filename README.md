@@ -1,4 +1,4 @@
-# type-filter (3.1.2)
+# type-filter (3.1.3)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -305,6 +305,7 @@ isNumber('1') // false
 getFilter(1) // error: handler has wrong type which equals number
 ```
 ##change list
+
 #### 3.1.0
 now all options in handlers are the same object which you pass to the third argument of `typeFilter`
 #### 3.0.0
