@@ -1,4 +1,4 @@
-# type-filter (3.1.1)
+# type-filter (3.1.2)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -122,9 +122,16 @@ if the third argument (or `once` key of the third argument)
 equals `true` the typeFilter returns a result of the first handler
 which returns some equals `true` (`1`, `true`, `{}`, `[]`, ...).
 ```javascript
-typeFilter(1, [no, off, type, yes]) // undefined > false > 'boolean' > 'string'
-typeFilter(1, [no, off, type, yes], true) // returns result of the type ('number')
-typeFilter(1, [no, off, yes, type], true) // returns result of the yes (1)
+typeFilter(1, [no, off, type, yes])
+// 1 > [no] > undefined > [off] > false > [type] > 'boolean' > [yes] > 'boolean'
+typeFilter(1, [no, off, type, yes], true)
+// 1 > [no] > undefined
+// 1 > [off] > false
+// 1 > [type] > 'number'
+typeFilter(1, [no, off, yes, type], true)
+// 1 > [no] > undefined
+// 1 > [off] > false
+// 1 > [yes] > 1
 ``` 
 if the third argument (or `once` key of the third argument)
 equals `function` the `function` gets result of handlerList's handler call
@@ -268,7 +275,7 @@ this custom property gets `value`, `type`, `className` as a handler
 ```javascript
 typeFilter(1, error('error: {custom}', {
   custom: (value, {type, className}) => `value: ${value}, type: ${type}, className: ${className}`
-})) // runs throw Error('value: 1, type: number, className: ')
+})) // runs throw Error('error: value: 1, type: number, className: ')
 ```
 
 #### handler
@@ -276,12 +283,10 @@ typeFilter(1, error('error: {custom}', {
 ```javascript
 const isNumber = typeFilter({
   number: on,
-  function: [call, isNumber],
   other: off
 }, handler)
 isNumber(1) // returns true
 isNumber('1') // returns false
-isNumber(() => 1) // returns true
 ```
 you may use the `handler` anywhere like other handlers
 ```javascript
@@ -299,10 +304,7 @@ isNumber(1) // true
 isNumber('1') // false
 getFilter(1) // error: handler has wrong type which equals number
 ```
-
 ##change list
-#### 3.1.1
-clearing code
 #### 3.1.0
 now all options in handlers are the same object which you pass to the third argument of `typeFilter`
 #### 3.0.0
