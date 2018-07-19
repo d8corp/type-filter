@@ -304,8 +304,8 @@ isNumber(1) // true
 isNumber('1') // false
 getFilter(1) // error: handler has wrong type which equals number
 ```
-##change list
-
+change list
+-
 #### 3.1.0
 now all options in handlers are the same object which you pass to the third argument of `typeFilter`
 #### 3.0.0
