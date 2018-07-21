@@ -1,4 +1,4 @@
-# type-filter (3.1.3)
+# type-filter (3.2.0)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -9,7 +9,9 @@
 [npm](https://www.npmjs.com/package/type-filter) |
 [github](https://github.com/d8corp/type-filter)
 ## install
-`npm i type-filter`
+```bash
+npm i type-filter
+```
 ## import
 ```javascript
 import typeFilter, { handler } from 'type-filter'
@@ -249,6 +251,17 @@ be careful, `recheck` can create an infinite loop
 typeFilter(1, recheck)
 ```
 
+#### callRecheck
+`callRecheck` is combine of `call` and `recheck`
+```javascript
+const isNumberHandler = {
+  function: callRecheck,
+  number: () => 'this is number',
+  other: () => 'this is not number'
+}
+typeFilter(() => 1, isNumberHandler) // returns 'this is number'
+```
+
 #### error
 `error` runs exception
 ```javascript
@@ -306,6 +319,8 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 change list
 -
+#### 3.2.0
+added callRecheck handler
 #### 3.1.0
 now all options in handlers are the same object which you pass to the third argument of `typeFilter`
 #### 3.0.0

@@ -9,7 +9,8 @@ var yes = typeFilter.yes,
     typeClass = typeFilter.typeClass,
     error = typeFilter.error,
     recheck = typeFilter.recheck,
-    handler = typeFilter.handler;
+    handler = typeFilter.handler,
+    callRecheck = typeFilter.callRecheck;
 
 function MyClass () {}
 var MyClass1 = MyClass;
@@ -276,5 +277,16 @@ describe('typeFilter', function () {
     expect(typeFilter(() => 1, deepHandler)).toBe(1);
     expect(typeFilter(() => () => 1, deepHandler)).toBe(2);
     expect(typeFilter(() => () => 1, deepHandler, {deep: 1})).toBe(3);
+  });
+  it('callRecheck', function () {
+    const isNumber = typeFilter({
+      function: callRecheck,
+      number: on,
+      other: off
+    }, handler);
+    expect(isNumber(1)).toBe(true);
+    expect(isNumber(() => 1)).toBe(true);
+    expect(isNumber(() => () => 1)).toBe(true);
+    expect(isNumber(() => () => '1')).toBe(false);
   });
 });

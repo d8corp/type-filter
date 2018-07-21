@@ -1,6 +1,7 @@
 /**
  * @typedef {'null'|'undefined'|'string'|'number'|'boolean'|'function'|'object'|'array'|'class'|'nan'|String} getTypeResult
  * */
+/** @typedef {Array<call|recheck>} callRecheck */
 /** @return {getTypeResult} */
 function getType (value) {
   if (value === null) {
@@ -27,7 +28,7 @@ function getType (value) {
  * @param {{once: *, rootHandler: typeHandler|typeFilterHandler|Array, type: getTypeResult, className: String}} options
  * */
 /**
- * @typedef {handler|yes|no|on|off|error|type|typeClass|call|recheck|typeFilterCustomHandler} typeFilterHandler
+ * @typedef {handler|yes|no|on|off|error|type|typeClass|call|recheck|callRecheck|typeFilterCustomHandler} typeFilterHandler
 /**
  * @typedef {Object} typeHandler
  * @property {typeHandler|typeFilterHandler|Array} [undefined]
@@ -63,6 +64,7 @@ function getType (value) {
  * @property {error} error
  * @property {handler} handler
  * @property {recheck} recheck
+ * @property {callRecheck} callRecheck
  * */
 function typeFilter (value, handlers, options) {
   if (!handlers) return getType(value);
@@ -138,6 +140,7 @@ typeFilter.recheck = recheck;
 typeFilter.yes = yes;
 typeFilter.call = call;
 typeFilter.handler = handler;
+typeFilter.callRecheck = [call, recheck];
 // custom handlers
 setHandler('no');
 setHandler('on');
