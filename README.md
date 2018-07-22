@@ -1,4 +1,4 @@
-# type-filter (3.2.0)
+# type-filter (3.2.1)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -6,8 +6,15 @@
  - `typeHandler` is an object
  - `options` is boolean or function or object
  
-[npm](https://www.npmjs.com/package/type-filter) |
-[github](https://github.com/d8corp/type-filter)
+links: [npm](https://www.npmjs.com/package/type-filter) |
+[github](https://github.com/d8corp/type-filter)  
+start: [install](#install) | [import](#import)  
+1 argument: [get type](#get-type)  
+2 argument: [handler](#handler) | [handlerList](#handlerList) | [typeHandler](#typeHandler)  
+3 argument: [once](#once) | [options](#options)  
+[default handlers](#default-handlers): [no](#no) | [yes](#yes) | [on, off](#on-off) |
+[type](#type) | [typeClass](#typeClass) | [call](#call) | [recheck](#recheck) |
+[callRecheck](#callRecheck) | [error](#error) | [handler](#handler-1)
 ## install
 ```bash
 npm i type-filter
@@ -168,7 +175,7 @@ const deep = (value, options) => {
   return value
 }
 const deepHandler = {
-  function: [deep, call, recheck],
+  function: [deep, callRecheck],
   other: (value, {deep}) => deep || 0
 }
 typeFilter(1, deepHandler) // returns 0
