@@ -141,6 +141,9 @@ typeFilter.yes = yes;
 typeFilter.call = call;
 typeFilter.handler = handler;
 typeFilter.callRecheck = [call, recheck];
+typeFilter.callRecheck.args = function () {
+  return [call.args.apply(this, arguments), recheck];
+};
 // custom handlers
 setHandler('no');
 setHandler('on');

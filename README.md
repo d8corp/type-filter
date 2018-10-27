@@ -1,4 +1,4 @@
-# type-filter (3.2.1)
+# type-filter (3.2.2)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -129,7 +129,8 @@ then each handler gets original value.
 
 if the third argument (or `once` key of the third argument)
 equals `true` the typeFilter returns a result of the first handler
-which returns some equals `true` (`1`, `true`, `{}`, `[]`, ...).
+which returns some equals `true` (`1`, `true`, `{}`, `[]`, ...).  
+>import {[yes](#yes), [no](#no), [off](#on,-off), [type](#type)} from 'type-filter' // [default handlers](#default-handlers)
 ```javascript
 typeFilter(1, [no, off, type, yes])
 // 1 > [no] > undefined > [off] > false > [type] > 'boolean' > [yes] > 'boolean'
@@ -159,7 +160,7 @@ if all handlers fail the test then typeFilter returns `undefined`
 ```javascript
 typeFilter(1, [yes, on, off], () => false) // returns undefined
 ```
-`handlerListType` works only for `handlerList`
+`once` works only for `handlerList`
 ```javascript
 typeFilter(0, yes, true) // returns 0
 typeFilter(0, [yes], true) // returns undefined
@@ -239,6 +240,12 @@ typeFilter({}, typeClass) // returns 'object'
 typeFilter(() => 1, call) // returns 1
 ```
 
+#### call.args
+`args` can provide arguments to function
+```javascript
+typeFilter(x => x, call.args(1)) // returns 1
+```
+
 #### recheck
 `recheck` is rechecking value like this type filter gets value of handler
 ```javascript
@@ -260,6 +267,7 @@ typeFilter(1, recheck)
 
 #### callRecheck
 `callRecheck` is combine of `call` and `recheck`
+`callRecheck` contains `args` property like `call` handler
 ```javascript
 const isNumberHandler = {
   function: callRecheck,
@@ -326,6 +334,8 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 change list
 -
+#### 3.2.2
+`call` handler has `args` property 
 #### 3.2.0
 added callRecheck handler
 #### 3.1.0

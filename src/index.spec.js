@@ -289,4 +289,25 @@ describe('typeFilter', function () {
     expect(isNumber(() => () => 1)).toBe(true);
     expect(isNumber(() => () => '1')).toBe(false);
   });
+  it('args', function () {
+    const isNumber = typeFilter({
+      function: call.args(1, '2'),
+      number: on,
+      other: off
+    }, handler);
+    expect(isNumber(1)).toBe(true);
+    expect(isNumber(x => x)).toBe(1);
+    expect(isNumber((x, y) => y)).toBe('2');
+  });
+  it('args callRecheck', function () {
+    const isNumber = typeFilter({
+      function: callRecheck.args(1, '2'),
+      number: on,
+      other: off
+    }, handler);
+    expect(isNumber(1)).toBe(true);
+    expect(isNumber(x => x)).toBe(true);
+    expect(isNumber((x, y) => y)).toBe(false);
+    expect(isNumber(() => x => x)).toBe(true);
+  });
 });
