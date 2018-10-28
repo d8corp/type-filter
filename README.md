@@ -1,4 +1,4 @@
-# type-filter (3.3.0)
+# type-filter (3.3.1)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
