@@ -1,7 +1,7 @@
 {
   "name": "type-filter",
   "author": "Deight",
-  "version": "3.2.2",
+  "version": "3.3.0",
   "description": "filtering values by type",
   "keywords": [
     "js",
@@ -19,7 +19,7 @@
     "type": "git",
     "url": "https://github.com/d8corp/type-filter.git"
   },
-  "main": "src/index.js",
+  "main": "index.js",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/d8corp/type-filter/issues"

@@ -29,7 +29,7 @@ function getType (value) {
  * */
 /**
  * @typedef {handler|yes|no|on|off|error|type|typeClass|call|recheck|callRecheck|typeFilterCustomHandler} typeFilterHandler
-/**
+ /**
  * @typedef {Object} typeHandler
  * @property {typeHandler|typeFilterHandler|Array} [undefined]
  * @property {typeHandler|typeFilterHandler|Array} [string]
@@ -42,7 +42,7 @@ function getType (value) {
  * @property {typeHandler|typeFilterHandler|Array} [symbol]
  * @property {typeHandler|typeFilterHandler|Array} [class]
  * @property {typeHandler|typeFilterHandler|Array} [other]
-/**
+ /**
  * @typedef {Object|Function} options
  * @property {String} [className]
  * @property {getTypeResult} [type]
@@ -79,7 +79,7 @@ function typeFilter (value, handlers, options) {
     } else if (optionsType === 'function') {
       options = {
         once: typeFilter([options, {
-          function: [ call, recheck ]
+          function: typeFilter.callRecheck
         }], handler, { rootHandler: handlers }),
         rootHandler: handlers
       }
@@ -144,17 +144,3 @@ typeFilter.callRecheck = [call, recheck];
 typeFilter.callRecheck.args = function () {
   return [call.args.apply(this, arguments), recheck];
 };
-// custom handlers
-setHandler('no');
-setHandler('on');
-setHandler('off');
-setHandler('type');
-setHandler('typeClass');
-setHandler('error');
-function setHandler (name) {
-  Object.defineProperty(typeFilter, name, {
-    get: function () {
-      return require('./handlers/' + name);
-    }
-  });
-}

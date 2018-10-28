@@ -1,4 +1,4 @@
-# type-filter (3.2.2)
+# type-filter (3.3.0)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -14,7 +14,7 @@ start: [install](#install) | [import](#import)
 3 argument: [once](#once) | [options](#options)  
 [default handlers](#default-handlers): [no](#no) | [yes](#yes) | [on, off](#on-off) |
 [type](#type) | [typeClass](#typeClass) | [call](#call) | [recheck](#recheck) |
-[callRecheck](#callRecheck) | [error](#error) | [handler](#handler-1)
+[callRecheck](#callRecheck) | [error](#error) | [array](#array) | [handler](#handler-1)
 ## install
 ```bash
 npm i type-filter
@@ -26,6 +26,11 @@ import typeFilter, { handler } from 'type-filter'
 or
 ```javascript
 import { typeFilter, handler } from 'type-filter'
+```
+to minimize code size use this importing
+```javascript
+import typeFilter from 'type-filter/typeFilter'
+import handler from 'type-filter/handlers/handler'
 ```
 ## get type
 Use only one argument to get a type.
@@ -306,6 +311,16 @@ typeFilter(1, error('error: {custom}', {
 })) // runs throw Error('error: value: 1, type: number, className: ')
 ```
 
+#### array
+`array` uses a handler for each item of it
+```javascript
+typeFilter([
+  () => 0,
+  () => 1,
+  () => 2
+], array(call)) // returns [0, 1, 2]
+```
+
 #### handler
 `handler` like bind method for a function but you may set up `handler` as default and use `value` later
 ```javascript
@@ -334,6 +349,9 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 change list
 -
+#### 3.3.0
+- fixed import bug for babel
+- added `array` handler
 #### 3.2.2
 `call` handler has `args` property 
 #### 3.2.0

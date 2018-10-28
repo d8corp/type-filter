@@ -10,6 +10,7 @@ var yes = typeFilter.yes,
     error = typeFilter.error,
     recheck = typeFilter.recheck,
     handler = typeFilter.handler,
+    array = typeFilter.array,
     callRecheck = typeFilter.callRecheck;
 
 function MyClass () {}
@@ -309,5 +310,8 @@ describe('typeFilter', function () {
     expect(isNumber(x => x)).toBe(true);
     expect(isNumber((x, y) => y)).toBe(false);
     expect(isNumber(() => x => x)).toBe(true);
+  });
+  it('array', function () {
+    expect(typeFilter([() => 0, () => 1, () => 2], array(call))).toEqual([0, 1, 2]);
   });
 });

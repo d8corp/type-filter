@@ -1,4 +1,3 @@
-console.warn('importing by "type-filter/src/handlers/error" is deprecated, please use "type-filter/handlers/error" for that');
 function getProperty (key, data, options, value) {
   if (key === 'value') return value;
   if (data.hasOwnProperty(key)) return data[key];

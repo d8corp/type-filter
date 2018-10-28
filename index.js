@@ -1,0 +1,16 @@
+var typeFilter = require('./typeFilter');
+var no = require('./handlers/no');
+var on = require('./handlers/on');
+var off = require('./handlers/off');
+var type = require('./handlers/type');
+var typeClass = require('./handlers/typeClass');
+var error = require('./handlers/error');
+var array = require('./handlers/array');
+typeFilter.no = no;
+typeFilter.on = on;
+typeFilter.off = off;
+typeFilter.type = type;
+typeFilter.typeClass = typeClass;
+typeFilter.error = error;
+typeFilter.array = array;
+module.exports = typeFilter;

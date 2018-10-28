@@ -1,4 +1,3 @@
-console.warn('importing by "type-filter/src/handlers/call" is deprecated, please use "type-filter/handlers/call" for that');
 function call (func) {
   return func()
 }
