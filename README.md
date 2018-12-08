@@ -1,4 +1,4 @@
-# type-filter (3.3.1)
+# type-filter (3.4.0)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -349,6 +349,13 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 change list
 -
+#### 3.4.0
+- `typeFilter({...}, handler /* , options */)` `handler` does not support `options`
+- custom handlers support `options`
+```javascript
+const myHandler = typeFilter({...}, handler)
+const value = myHandler('test', {...})
+```
 #### 3.3.0
 - fixed import bug for babel
 - added `array` handler

@@ -279,6 +279,21 @@ describe('typeFilter', function () {
     expect(typeFilter(() => () => 1, deepHandler)).toBe(2);
     expect(typeFilter(() => () => 1, deepHandler, {deep: 1})).toBe(3);
   });
+  it('custom options as handler', function () {
+    const deep = (value, options) => {
+      const deep = options.deep || 0;
+      options.deep = deep + 1;
+      return value
+    };
+    const deepHandler = typeFilter({
+      function: [deep, call, recheck],
+      other: (value, {deep}) => deep || 0
+    }, handler);
+    expect(deepHandler(1)).toBe(0);
+    expect(deepHandler(() => 1)).toBe(1);
+    expect(deepHandler(() => () => 1)).toBe(2);
+    expect(deepHandler(() => () => 1, {deep: 1})).toBe(3);
+  });
   it('callRecheck', function () {
     const isNumber = typeFilter({
       function: callRecheck,

@@ -1,8 +1,6 @@
 var typeFilter = require('../typeFilter');
-module.exports = function handler (handler, options) {
-  return options.rootHandler = function (value) {
-    options.type = undefined;
-    options.typeClass = undefined;
+module.exports = function handler (handler) {
+  return function (value, options) {
     return typeFilter(value, handler, options)
   }
 };
