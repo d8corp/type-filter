@@ -1,4 +1,4 @@
-# type-filter (3.4.0)
+# type-filter (3.5.0)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -14,7 +14,7 @@ start: [install](#install) | [import](#import)
 3 argument: [once](#once) | [options](#options)  
 [default handlers](#default-handlers): [no](#no) | [yes](#yes) | [on, off](#on-off) |
 [type](#type) | [typeClass](#typeClass) | [call](#call) | [recheck](#recheck) |
-[callRecheck](#callRecheck) | [error](#error) | [array](#array) | [handler](#handler-1)
+[callRecheck](#callRecheck) | [error](#error) | [map](#map) | [handler](#handler-1)
 ## install
 ```bash
 npm i type-filter
@@ -311,14 +311,35 @@ typeFilter(1, error('error: {custom}', {
 })) // runs throw Error('error: value: 1, type: number, className: ')
 ```
 
-#### array
-`array` uses a handler for each item of it
+#### map
+`map` uses a handler for each item of it like `map` of an array
 ```javascript
 typeFilter([
   () => 0,
   () => 1,
   () => 2
-], array(call)) // returns [0, 1, 2]
+], map(call)) // returns [0, 1, 2]
+```
+handlerList also works
+```javascript
+typeFilter([
+  () => 0,
+  () => 1,
+  () => 2
+], map([call, v => ++v])) // returns [1, 2, 3]
+```
+and of course typeHandler
+```javascript
+typeFilter([
+  () => 0,
+  1,
+  '2',
+  () => '2'
+], map({
+  function: callRecheck,
+  number: yes,
+  other: off
+})) // returns [0, 1, false, false]
 ```
 
 #### handler
@@ -349,6 +370,9 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 change list
 -
+#### 3.5.0
+- deprecated `array` handler
+- added `map` handler
 #### 3.4.0
 - `typeFilter({...}, handler /* , options */)` `handler` does not support `options`
 - custom handlers support `options`
