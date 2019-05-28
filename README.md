@@ -1,4 +1,4 @@
-# type-filter (3.5.0)
+# type-filter (3.5.1)
 `typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
  - `value` is any type
  - `handler` is a function
@@ -370,6 +370,8 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 change list
 -
+#### 3.5.1
+- updated version of `jest`
 #### 3.5.0
 - deprecated `array` handler
 - added `map` handler

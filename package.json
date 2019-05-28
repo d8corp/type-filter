@@ -1,7 +1,7 @@
 {
   "name": "type-filter",
   "author": "Deight",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "filtering values by type",
   "keywords": [
     "js",
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/d8corp/type-filter#readme",
   "devDependencies": {
-    "jest": "^22.1.4"
+    "jest": "^24.6.0"
   },
   "scripts": {
     "start": "jest --colors --watch --testPathPattern index.spec.js --testNamePattern typeFilter",
