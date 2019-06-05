@@ -1,17 +1,21 @@
-# type-filter (3.5.1)
-`typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ])`
+# type-filter (4.0.0)
+`typeFilter([ value ] [, handler | handlerList | typeHandler ] [, options ] [, ...otherArguments ])`
  - `value` is any type
  - `handler` is a function
  - `handlerList` is an array
  - `typeHandler` is an object
  - `options` is boolean or function or object
+ - `otherArguments` are any types
+ 
+ **first** argument: [get type](#get-type)  
+ **second** argument: [handler](#handler) | [handlerList](#handlerList) | [typeHandler](#typeHandler)  
+ **third** argument: [once](#once) | [options](#options)  
+ **other** arguments: [other arguments](#other-arguments)
  
 links: [npm](https://www.npmjs.com/package/type-filter) |
 [github](https://github.com/d8corp/type-filter)  
 start: [install](#install) | [import](#import)  
-1 argument: [get type](#get-type)  
-2 argument: [handler](#handler) | [handlerList](#handlerList) | [typeHandler](#typeHandler)  
-3 argument: [once](#once) | [options](#options)  
+  
 [default handlers](#default-handlers): [no](#no) | [yes](#yes) | [on, off](#on-off) |
 [type](#type) | [typeClass](#typeClass) | [call](#call) | [recheck](#recheck) |
 [callRecheck](#callRecheck) | [error](#error) | [map](#map) | [handler](#handler-1)
@@ -189,6 +193,13 @@ typeFilter(() => 1, deepHandler) // returns 1
 typeFilter(() => () => 1, deepHandler) // returns 2
 typeFilter(() => () => 1, deepHandler, {deep: 1}) // returns 3
 ``` 
+
+## other arguments
+you may provide any variables to all handlers
+```javascript
+typeFilter(0, (value, options, ...args) => ([value, ...args]), undefined, 1, 2, 3, 4, 5)
+// returns [0, 1, 2, 3, 4, 5]
+```
 
 ## default handlers
 you may use default handlers from this library
@@ -370,6 +381,10 @@ getFilter(1) // error: handler has wrong type which equals number
 ```
 change list
 -
+#### 4.0.0
+- removed `array` handler
+- added other arguments functionality
+- added `callRecheck` to handlers
 #### 3.5.1
 - updated version of `jest`
 #### 3.5.0

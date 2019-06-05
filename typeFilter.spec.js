@@ -130,6 +130,16 @@ describe('typeFilter', function () {
     expect(typeFilter(new MyClass(), [no, off, type, typeClass], true)).toBe('class');
     expect(typeFilter(new MyClass(), [no, off, typeClass, type], true)).toBe('MyClass');
   });
+  it('other arguments', function () {
+    const degree = (a, b, c) => a ** c;
+    expect(typeFilter(3, degree, undefined, 2)).toBe(9);
+    expect(typeFilter(3, degree, undefined, 3)).toBe(27);
+    expect(typeFilter(0, (value, options, ...args) => [value, ...args], undefined, 1, 2, 3, 4, 5)).toEqual([0,1,2,3,4,5]);
+    expect(typeFilter(0, [(value, options, ...args) => [value, ...args]], undefined, 1, 2, 3, 4, 5)).toEqual([0,1,2,3,4,5]);
+    expect(typeFilter(0, {
+      number: [(value, options, ...args) => [value, ...args]]
+    }, undefined, 1, 2, 3, 4, 5)).toEqual([0,1,2,3,4,5]);
+  });
   it('default handler: no', function () {
     expect(typeFilter(1, no)).toBe(undefined);
     var noNumber = {
@@ -199,6 +209,14 @@ describe('typeFilter', function () {
         return 1
       }
     }, isNumberHandler)).toBe(true);
+
+    var more = {
+      string: [v => v | 0, recheck],
+      number: (value, options, ...args) => args.filter(a => a > value)
+    };
+    expect(typeFilter(3, more, false, 4, 2, 6, 1, 5)).toEqual([4, 6, 5]);
+    var moreThen = typeFilter(more, handler);
+    expect(moreThen(5, 7, 2, 6, 8, 3)).toEqual([7, 6, 8]);
   });
   it('default handler: error', function () {
     expect(function () {
@@ -233,6 +251,9 @@ describe('typeFilter', function () {
     expect(isNumber(function () {
       return '1'
     })).toBe(false);
+
+    const ars = typeFilter((value, options, ...args) => [value, ...args], handler, false, 1, 2);
+    expect(ars(0, 3, 4)).toEqual([0, 1, 2, 3, 4]);
 
     function getFilter (value) {
       return typeFilter(value, {
@@ -295,6 +316,17 @@ describe('typeFilter', function () {
     expect(deepHandler(() => () => 1, {deep: 1})).toBe(3);
   });
   it('callRecheck', function () {
+    const handler = {
+      function: callRecheck,
+      number: on,
+      other: off
+    };
+    expect(typeFilter(1,  handler)).toBe(true);
+    expect(typeFilter(() => 1, handler)).toBe(true);
+    expect(typeFilter(() => () => 1, handler)).toBe(true);
+    expect(typeFilter(() => () => '1', handler)).toBe(false);
+  });
+  it('callRecheck with handler', function () {
     const isNumber = typeFilter({
       function: callRecheck,
       number: on,
